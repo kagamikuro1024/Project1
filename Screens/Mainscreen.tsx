@@ -1,88 +1,30 @@
-import React, { useState } from 'react';
+//MainScreen.tsx
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, ScrollView, View, Text, Alert } from 'react-native';
 import { Appbar, TextInput, Button, Card, List, Divider, IconButton, Modal, Portal, Provider } from 'react-native-paper';
 import { format, parseISO } from 'date-fns';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { NavigationContainer } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-const Tab = createBottomTabNavigator();
-type Income = {
-  amount: string;
-  date: string;
-};
-
-type Expense = {
-  category: string;
-  amount: string;
-  date: string;
-};
-
-type AppData = {
-  incomes: Income[];
-  expenses: Expense[];
-  totalIncome: number;
-  totalExpense: number;
-};
+import { useAppContext } from '../context/AppContext';
+import InitialDataLoader from '../components/InitialDataLoader';
 const STORAGE_KEY = 'moneyhs_data';
-
-// Helper function to save all app data
-export const saveAppData = async (data: AppData): Promise<void> => {
-  try {
-    const jsonData = JSON.stringify(data);
-    await AsyncStorage.setItem(STORAGE_KEY, jsonData);
-    console.log('Data saved successfully');
-  } catch (error) {
-    console.error('Error saving data:', error);
-    throw new Error('Failed to save app data');
-  }
-};
-
-// Helper function to load all app data
-export const loadAppData = async (): Promise<AppData | null> => {
-  try {
-    const jsonData = await AsyncStorage.getItem(STORAGE_KEY);
-    if (jsonData) {
-      return JSON.parse(jsonData) as AppData;
-    }
-    return null;
-  } catch (error) {
-    console.error('Error loading data:', error);
-    throw new Error('Failed to load app data');
-  }
-};
-
-// Helper function to clear all app data
-export const clearAppData = async (): Promise<void> => {
-  try {
-    await AsyncStorage.removeItem(STORAGE_KEY);
-    console.log('Data cleared successfully');
-  } catch (error) {
-    console.error('Error clearing data:', error);
-    throw new Error('Failed to clear app data');
-  }
-};
 const MainScreen = () => {
-  const [income, setIncome] = useState<string>('');
-  const [expense, setExpense] = useState<string>('');
-  const [expenses, setExpenses] = useState<{ category: string; amount: string; date: string }[]>([]);
-  const [incomes, setIncomes] = useState<{ amount: string; date: string }[]>([]);
-  const [totalIncome, setTotalIncome] = useState<number>(0);
-  const [totalExpense, setTotalExpense] = useState<number>(0);
+  // Context state
+  const { state, dispatch } = useAppContext();
+  // Local state chỉ cho UI
+  const [income, setIncome] = useState(''); // Input field thu nhập
+  const [expense, setExpense] = useState(''); // Input field chi tiêu
   const [categories] = useState(['Ăn uống', 'Giải trí', 'Du lịch', 'Khác']);
   const [isEditModalVisible, setEditModalVisible] = useState(false);
   const [editValue, setEditValue] = useState('');
   const [editIndex, setEditIndex] = useState<number | null>(null);
   const [isEditingIncome, setIsEditingIncome] = useState(false);
-  const [groupBy, setGroupBy] = useState<'day' | 'month'>('month');
-  React.useEffect(() => {
+  // Load data từ AsyncStorage khi component mount
+  useEffect(() => {
     const loadData = async () => {
       try {
-        const savedData = await loadAppData();
+        const savedData = await AsyncStorage.getItem(STORAGE_KEY);
         if (savedData) {
-          setIncomes(savedData.incomes);
-          setExpenses(savedData.expenses);
-          setTotalIncome(savedData.totalIncome);
-          setTotalExpense(savedData.totalExpense);
+          dispatch({ type: 'SET_DATA', payload: JSON.parse(savedData) });
         }
       } catch (error) {
         Alert.alert('Lỗi', 'Không thể tải dữ liệu. Vui lòng thử lại sau.');
@@ -90,49 +32,54 @@ const MainScreen = () => {
     };
     loadData();
   }, []);
-
-  // Save data whenever relevant state changes
-  React.useEffect(() => {
+  // Lưu data vào AsyncStorage khi state thay đổi
+  useEffect(() => {
     const saveData = async () => {
       try {
-        await saveAppData({
-          incomes,
-          expenses,
-          totalIncome,
-          totalExpense,
-        });
+        await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       } catch (error) {
         Alert.alert('Lỗi', 'Không thể lưu dữ liệu. Vui lòng thử lại sau.');
       }
     };
     saveData();
-  }, [incomes, expenses, totalIncome, totalExpense]);
+  }, [state]);
+  
+  // Xử lý thêm thu nhập
   const handleAddIncome = () => {
     const amount = parseFloat(income);
-    const currentDate = new Date().toISOString();
     if (!isNaN(amount) && amount > 0) {
-      setIncomes((prev) => [...prev, { amount: amount.toString(), date: currentDate }]);
-      setTotalIncome((prev) => prev + amount);
-      setIncome('');
+      dispatch({
+        type: 'ADD_INCOME',
+        payload: {
+          amount: amount.toString(),
+          date: new Date().toISOString(),
+          description: 'Chi tiêu'
+        }
+      });
+      setIncome(''); // Clear input field
     } else {
-      alert('Vui lòng nhập một giá trị hợp lệ!!!');
+      Alert.alert('Lỗi', 'Vui lòng nhập một số tiền hợp lệ');
     }
   };
-
+  // Xử lý thêm chi tiêu
   const handleAddExpense = (category: string) => {
     const amount = parseFloat(expense);
-    const currentDate = new Date().toISOString();
     if (!isNaN(amount) && amount > 0) {
-      setExpenses((prev) => [...prev, { category, amount: amount.toString(), date: currentDate }]);
-      setTotalExpense((prev) => prev + amount);
-      setExpense('');
+      dispatch({
+        type: 'ADD_EXPENSE',
+        payload: {
+          category,
+          amount: amount.toString(),
+          date: new Date().toISOString(),
+          description: 'Chi tiêu'
+        }
+      });
+      setExpense(''); // Clear input field
     } else {
-      alert('Vui lòng nhập một giá trị hợp lệ!!!');
+      Alert.alert('Lỗi', 'Vui lòng nhập một số tiền hợp lệ');
     }
   };
-
-
-  // Xóa thu nhập
+  // Xử lý xóa thu nhập
   const handleDeleteIncome = (index: number) => {
     Alert.alert(
       'Xác nhận xóa',
@@ -141,18 +88,12 @@ const MainScreen = () => {
         { text: 'Hủy', style: 'cancel' },
         {
           text: 'Xóa',
-          onPress: () => {
-            const deletedAmount = parseFloat(incomes[index].amount);
-            setIncomes((prev) => prev.filter((_, i) => i !== index));
-            setTotalIncome((prev) => prev - deletedAmount);
-          },
-        },
-      ],
-      { cancelable: true }
+          onPress: () => dispatch({ type: 'DELETE_INCOME', index })
+        }
+      ]
     );
   };
-
-  // Xóa chi tiêu
+  // Xử lý xóa chi tiêu
   const handleDeleteExpense = (index: number) => {
     Alert.alert(
       'Xác nhận xóa',
@@ -161,60 +102,55 @@ const MainScreen = () => {
         { text: 'Hủy', style: 'cancel' },
         {
           text: 'Xóa',
-          onPress: () => {
-            const deletedAmount = parseFloat(expenses[index].amount);
-            setExpenses((prev) => prev.filter((_, i) => i !== index));
-            setTotalExpense((prev) => prev - deletedAmount);
-          },
-        },
-      ],
-      { cancelable: true }
+          onPress: () => dispatch({ type: 'DELETE_EXPENSE', index })
+        }
+      ]
     );
   };
+  // Xử lý sửa thu nhập
   const handleEditIncome = (index: number) => {
-    setEditValue(incomes[index].amount);
+    setEditValue(state.incomes[index].amount);
     setEditIndex(index);
-    setIsEditingIncome(true); // Đang sửa thu nhập
+    setIsEditingIncome(true);
     setEditModalVisible(true);
   };
-
+  // Xử lý sửa chi tiêu 
   const handleEditExpense = (index: number) => {
-    setEditValue(expenses[index].amount);
+    setEditValue(state.expenses[index].amount);
     setEditIndex(index);
-    setIsEditingIncome(false); // Đang sửa chi tiêu
+    setIsEditingIncome(false);
     setEditModalVisible(true);
   };
+  // Xử lý lưu chỉnh sửa
   const handleSaveEdit = () => {
     const newAmount = parseFloat(editValue);
     if (!isNaN(newAmount) && newAmount > 0 && editIndex !== null) {
       if (isEditingIncome) {
-        const updatedIncomes = [...incomes];
-        const oldAmount = parseFloat(updatedIncomes[editIndex].amount);
-        updatedIncomes[editIndex].amount = newAmount.toString();
-        setIncomes(updatedIncomes);
-        setTotalIncome((prev) => prev - oldAmount + newAmount);
+        dispatch({
+          type: 'EDIT_INCOME',
+          index: editIndex,
+          newAmount: newAmount.toString()
+        });
       } else {
-        const updatedExpenses = [...expenses];
-        const oldAmount = parseFloat(updatedExpenses[editIndex].amount);
-        updatedExpenses[editIndex].amount = newAmount.toString();
-        setExpenses(updatedExpenses);
-        setTotalExpense((prev) => prev - oldAmount + newAmount);
+        dispatch({
+          type: 'EDIT_EXPENSE',
+          index: editIndex,
+          newAmount: newAmount.toString()
+        });
       }
       setEditModalVisible(false);
       setEditValue('');
       setEditIndex(null);
     } else {
-      alert('Vui lòng nhập một giá trị hợp lệ!');
+      Alert.alert('Lỗi', 'Vui lòng nhập một số tiền hợp lệ');
     }
   };
-
-
-  const groupExpenses = (groupBy: 'day' | 'month') => {
-    const grouped: Record<string, { category: string; amount: string; date: string }[]> = {};
-    expenses.forEach((expense) => {
+  // Nhóm chi tiêu theo ngày
+  const groupExpenses = () => {
+    const grouped: Record<string, typeof state.expenses> = {};
+    state.expenses.forEach((expense) => {
       const date = parseISO(expense.date);
-      const groupKey =
-        groupBy === 'day' ? format(date, 'dd-MM-yyyy') : format(date, 'dd-MM-yyyy'); 
+      const groupKey = format(date, 'dd-MM-yyyy');
       if (!grouped[groupKey]) {
         grouped[groupKey] = [];
       }
@@ -222,13 +158,12 @@ const MainScreen = () => {
     });
     return grouped;
   };
-
-  const groupIncomes = (groupBy: 'day' | 'month') => {
-    const grouped: Record<string, { amount: string; date: string }[]> = {};
-    incomes.forEach((income) => {
+  // Nhóm thu nhập theo ngày
+  const groupIncomes = () => {
+    const grouped: Record<string, typeof state.incomes> = {};
+    state.incomes.forEach((income) => {
       const date = parseISO(income.date);
-      const groupKey =
-        groupBy === 'day' ? format(date, 'dd-MM-yyyy') : format(date, 'dd-MM-yyyy'); 
+      const groupKey = format(date, 'dd-MM-yyyy');
       if (!grouped[groupKey]) {
         grouped[groupKey] = [];
       }
@@ -236,12 +171,10 @@ const MainScreen = () => {
     });
     return grouped;
   };
-
-  const currentBalance = totalIncome - totalExpense;
-
+  const currentBalance = state.totalIncome - state.totalExpense;
   return (
+    
     <Provider>
-      {/* Thanh tiêu đề */}
       <Appbar.Header style={styles.header}>
         <Appbar.Content
           title="MoneyHS - Quản lý chi tiêu"
@@ -253,19 +186,13 @@ const MainScreen = () => {
         <Card.Title title="Tổng số dư:" />
         <Divider />
         <Card.Content>
-          <Text
-            style={[
-              styles.balanceText,
-              currentBalance < 0 ? styles.negative : styles.positive,
-            ]}
-          >
-            {currentBalance} đ
+          <Text style={[styles.balanceText, currentBalance < 0 ? styles.negative : styles.positive]}>
+            {currentBalance.toLocaleString()} đ
           </Text>
         </Card.Content>
       </Card>
-
       <ScrollView style={styles.container}>
-        {/* Nhập thông tin thu nhập */}
+        {/* Thu nhập */}
         <Card style={styles.card}>
           <Card.Title title="Thu nhập" />
           <Divider />
@@ -282,18 +209,17 @@ const MainScreen = () => {
             </Button>
           </Card.Content>
         </Card>
-
-        {/* Hiển thị thông tin thu nhập */}
+        {/* Danh sách thu nhập */}
         <Card style={styles.card}>
           <Card.Title title="Thông tin thu nhập" />
           <Card.Content>
-            {Object.entries(groupIncomes(groupBy)).map(([groupKey, groupedIncomes]) => (
-              <View key={groupKey} style={styles.group}>
-                <Text style={styles.groupTitle}>{groupKey}</Text>
-                {groupedIncomes.map((income, index) => (
+            {Object.entries(groupIncomes()).map(([date, incomes]) => (
+              <View key={date} style={styles.group}>
+                <Text style={styles.groupTitle}>{date}</Text>
+                {incomes.map((income, index) => (
                   <View key={index} style={styles.listItem}>
                     <List.Item
-                      title={`Số tiền: ${income.amount} VNĐ`}
+                      title={`Số tiền: ${parseFloat(income.amount).toLocaleString()} VNĐ`}
                       left={(props) => <List.Icon {...props} icon="cash" />}
                     />
                     <IconButton icon="delete" iconColor="grey" onPress={() => handleDeleteIncome(index)} />
@@ -304,8 +230,6 @@ const MainScreen = () => {
             ))}
           </Card.Content>
         </Card>
-
-
         {/* Chi tiêu */}
         <Card style={styles.card}>
           <Card.Title title="Chi tiêu" />
@@ -330,19 +254,18 @@ const MainScreen = () => {
             ))}
           </Card.Content>
         </Card>
-
-        {/* Hiển thị thông tin chi tiêu */}
+        {/* Danh sách chi tiêu */}
         <Card style={styles.card}>
           <Card.Title title="Thông tin chi tiêu" />
           <Card.Content>
-            {Object.entries(groupExpenses(groupBy)).map(([groupKey, groupedExpenses]) => (
-              <View key={groupKey} style={styles.group}>
-                <Text style={styles.groupTitle}>{groupKey}</Text>
-                {groupedExpenses.map((expense, index) => (
+            {Object.entries(groupExpenses()).map(([date, expenses]) => (
+              <View key={date} style={styles.group}>
+                <Text style={styles.groupTitle}>{date}</Text>
+                {expenses.map((expense, index) => (
                   <View key={index} style={styles.listItem}>
                     <List.Item
                       title={`Danh mục: ${expense.category}`}
-                      description={`Số tiền: -${expense.amount} VNĐ`}
+                      description={`Số tiền: -${parseFloat(expense.amount).toLocaleString()} VNĐ`}
                       left={(props) => <List.Icon {...props} icon="cash" />}
                     />
                     <IconButton icon="delete" iconColor="grey" onPress={() => handleDeleteExpense(index)} />
@@ -356,18 +279,12 @@ const MainScreen = () => {
       </ScrollView>
       {/* Modal chỉnh sửa */}
       <Portal>
-        
         <Modal
           visible={isEditModalVisible}
           onDismiss={() => setEditModalVisible(false)}
-          contentContainerStyle={{
-            backgroundColor: 'white',
-            padding: 20,
-            margin: 20,
-            borderRadius: 10,
-          }}
+          contentContainerStyle={styles.modalContainer}
         >
-          <Text style={{ fontSize: 18, marginBottom: 10 }}>
+          <Text style={styles.modalTitle}>
             {isEditingIncome ? 'Sửa Thu Nhập' : 'Sửa Chi Tiêu'}
           </Text>
           <TextInput
@@ -376,9 +293,9 @@ const MainScreen = () => {
             onChangeText={setEditValue}
             keyboardType="numeric"
             mode="outlined"
-            style={{ marginBottom: 10 }}
+            style={styles.modalInput}
           />
-          <Button mode="contained" onPress={handleSaveEdit} style={{ marginVertical: 5 }}>
+          <Button mode="contained" onPress={handleSaveEdit} style={styles.modalButton}>
             Lưu
           </Button>
           <Button mode="outlined" onPress={() => setEditModalVisible(false)}>
@@ -386,14 +303,13 @@ const MainScreen = () => {
           </Button>
         </Modal>
       </Portal>
-
     </Provider>
   );
 };
-
-export default MainScreen;
-
 const styles = StyleSheet.create({
+  header: {
+    justifyContent: 'center',
+  },
   title: {
     flex: 1,
     alignItems: 'center',
@@ -405,8 +321,10 @@ const styles = StyleSheet.create({
     color: '#4CAF50',
     textAlign: 'center',
   },
-  header: {
-    justifyContent: 'center',
+  container: {
+    flex: 1,
+    backgroundColor: '#f8f9fa',
+    padding: 10,
   },
   balanceCard: {
     marginBottom: 16,
@@ -416,11 +334,6 @@ const styles = StyleSheet.create({
     fontSize: 30,
     fontWeight: 'bold',
     textAlign: 'center',
-  },
-  container: {
-    flex: 1,
-    backgroundColor: '#f8f9fa',
-    padding: 10,
   },
   card: {
     marginVertical: 10,
@@ -451,4 +364,21 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 5,
   },
+  modalContainer: {
+    backgroundColor: 'white',
+    padding: 20,
+    margin: 20,
+    borderRadius: 10,
+  },
+  modalTitle: {
+    fontSize: 18,
+    marginBottom: 10,
+  },
+  modalInput: {
+    marginBottom: 10,
+  },
+  modalButton: {
+    marginVertical: 5,
+  },
 });
+export default MainScreen;

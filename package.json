@@ -1,8 +1,8 @@
 {
-  "name": "learn-react-native-hoidanit",
+  "name": "MoneyHS",
   "author": {
-    "name": "Hỏi Dân IT",
-    "url": "https://hoidanit.vn"
+    "name": "LeVanQuangTrung",
+    "url": "https://www.facebook.com/oOoKuroKamioOo/"
   },
   "version": "1.0.0",
   "main": "expo/AppEntry.js",
@@ -24,10 +24,12 @@
     "expo-status-bar": "1.12.1",
     "react": "18.2.0",
     "react-native": "0.74.3",
+    "react-native-chart-kit": "^6.12.0",
     "react-native-gesture-handler": "^2.21.2",
     "react-native-paper": "^5.12.5",
     "react-native-safe-area-context": "^5.0.0",
     "react-native-screens": "^4.4.0",
+    "react-native-svg": "^15.11.1",
     "react-native-vector-icons": "^10.2.0"
   },
   "devDependencies": {
