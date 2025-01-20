@@ -5,7 +5,8 @@ import { Appbar, TextInput, Button, Card, List, Divider, IconButton, Modal, Port
 import { format, parseISO } from 'date-fns';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAppContext } from '../context/AppContext';
-import InitialDataLoader from '../components/InitialDataLoader';
+
+
 const STORAGE_KEY = 'moneyhs_data';
 const MainScreen = () => {
   // Context state

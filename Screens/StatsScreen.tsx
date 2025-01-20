@@ -178,6 +178,7 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   title: {
+    paddingTop: 16,
     fontSize: 20,
     fontWeight: 'bold',
     textAlign: 'center',

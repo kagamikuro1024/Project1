@@ -5,6 +5,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import BottomTabNavigator from './Routes/BottomTabNavigator';
 import { AppProvider } from './context/AppContext';
 import InitialDataLoader from './components/InitialDataLoader';
+import DailyNotification from './components/DailyNotification';
 
 const App = () => {
   return (
@@ -13,6 +14,7 @@ const App = () => {
         <PaperProvider>
           <NavigationContainer>
             <InitialDataLoader />
+            <DailyNotification />
             <BottomTabNavigator />
           </NavigationContainer>
         </PaperProvider>

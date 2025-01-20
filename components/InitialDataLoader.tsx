@@ -9,7 +9,7 @@ const InitialDataLoader = () => {
     dispatch({ type: 'RESET_DATA' });
 
     // Định nghĩa dữ liệu chi tiêu tháng 2
-    const februaryData = [
+    const februaryData = [ 
       {
         date: "2024-02-01",
         amount: "4500000",
@@ -69,7 +69,13 @@ const InitialDataLoader = () => {
         amount: "500000",
         category: "Giải trí",
         description: "Chi tiêu giải trí"
-      }
+      },
+      {
+        date: "2024-01-20",
+        amount: "200000",
+        category: "Khác",
+        description: "Chi tiêu khác"
+      },
     ];  
     januaryData.forEach(item => {
       if (item.category === "Thu nhập") {
@@ -81,5 +87,6 @@ const InitialDataLoader = () => {
   }, [dispatch]);  
   return null;
 };
+
 
 export default InitialDataLoader;
