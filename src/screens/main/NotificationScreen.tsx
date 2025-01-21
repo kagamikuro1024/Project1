@@ -3,7 +3,7 @@ import { View, StyleSheet, FlatList, Alert } from 'react-native';
 import { Text, Card, IconButton, Button } from 'react-native-paper';
 import * as Notifications from 'expo-notifications';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useAppContext } from '../context/AppContext';
+import { useAppContext } from '../../context/AppContext';
 
 const NotificationScreen = () => {
   const { state } = useAppContext();

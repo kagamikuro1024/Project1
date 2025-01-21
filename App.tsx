@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { PaperProvider } from 'react-native-paper';
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import BottomTabNavigator from './Routes/BottomTabNavigator';
-import { AppProvider, useAppContext } from './context/AppContext';
-import InitialDataLoader from './components/InitialDataLoader';
-import DailyNotification from './components/DailyNotification';
-import PasswordScreen from './Screens/PasswordScreen';
+import BottomTabNavigator from './src/navigation/BottomTabNavigator';
+import { AppProvider, useAppContext } from './src/context/AppContext';
+import InitialDataLoader from './src/components/features/InitialDataLoader';
+import DailyNotification from './src/components/features/DailyNotification';
+import PasswordScreen from './src/screens/auth/PasswordScreen';
 
 const AppContent = () => {
   const { state } = useAppContext();

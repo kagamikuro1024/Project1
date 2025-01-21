@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { lightTheme, darkTheme } from './themes';
+import { lightTheme, darkTheme } from '../hooks/themes';
 
 type Expense = { category: string; amount: string; date: string; description: string };
 type Income = { amount: string; date: string; description: string };

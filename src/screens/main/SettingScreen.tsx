@@ -4,8 +4,8 @@ import { List, Switch, Modal, Portal, Button, TextInput } from 'react-native-pap
 import { TimePickerModal } from 'react-native-paper-dates';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Notifications from 'expo-notifications';
-import PasswordScreen from './PasswordScreen'; // Ensure this path is correct or adjust it to the correct location
-import { useAppContext } from '../context/AppContext';
+import PasswordScreen from '../auth/PasswordScreen'; // Ensure this path is correct or adjust it to the correct location
+import { useAppContext } from '../../context/AppContext';
 
 const STORAGE_KEYS = {
   LANGUAGE: '@settings_language',

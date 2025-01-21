@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, ScrollView, Dimensions, StyleSheet } from 'react-native';
 import { BarChart, PieChart } from 'react-native-chart-kit';
-import { useAppContext } from '../context/AppContext';
+import { useAppContext } from '../../context/AppContext';
 
 const groupDataByMonth = (data: { date: string; amount: string }[]) => {
   const grouped: { [key: number]: number } = {};

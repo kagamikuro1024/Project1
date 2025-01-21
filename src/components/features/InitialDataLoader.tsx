@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useAppContext } from '../context/AppContext';
+import { useAppContext } from '../../context/AppContext';
 
 const InitialDataLoader = () => {
   const { dispatch } = useAppContext();

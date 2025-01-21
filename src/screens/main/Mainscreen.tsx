@@ -4,7 +4,7 @@ import { StyleSheet, ScrollView, View, Text, Alert } from 'react-native';
 import { Appbar, TextInput, Button, Card, List, Divider, IconButton, Modal, Portal, Provider } from 'react-native-paper';
 import { format, parseISO } from 'date-fns';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useAppContext } from '../context/AppContext';
+import { useAppContext } from '../../context/AppContext';
 
 
 const STORAGE_KEY = 'moneyhs_data';

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Keyboard } from 'react-native';
 import { TextInput, Button, Text, Surface } from 'react-native-paper';
-import { useAppContext } from '../context/AppContext';
+import { useAppContext } from '../../context/AppContext';
 
 interface PasswordScreenProps {
   onSuccess: () => void;

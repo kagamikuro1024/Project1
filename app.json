@@ -4,14 +4,14 @@
     "slug": "MoneyHS",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./src/assets/images/icon.png",
     "userInterfaceStyle": "automatic",
     "locales": {
-      "vi": "./languages/vi.json",
-      "en": "./languages/en.json"
+      "vi": "./localization/vi.json",
+      "en": "./localization/en.json"
     },
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./src/assets/images/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -21,13 +21,13 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./src/assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
       "userInterfaceStyle": "automatic"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./src/assets/images/favicon.png"
     }
   }
 }

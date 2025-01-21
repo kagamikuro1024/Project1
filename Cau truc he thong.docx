@@ -1,0 +1,56 @@
+app.tsx                    # Entry point của ứng dụng
+src/
+├── assets/                    # Các tài nguyên static
+│   ├── images/               # Hình ảnh (.png, .jpg)
+│   ├── icons/                # Icons
+│   └── fonts/                # Custom fonts nếu có
+│
+├── navigation/               # Logic điều hướng 
+│   ├── types.ts             # Type definitions cho navigation
+│   ├── BottomTabNavigator.tsx
+│
+├── screens/                  # Các màn hình chính
+│   ├── auth/                # Các màn hình liên quan authentication
+│   │   └── PasswordScreen.tsx
+│   ├── main/                # Các màn hình chính của app
+│   │   ├── MainScreen.tsx
+│   │   ├── NotificationScreen.tsx
+│   │   ├── SettingScreen.tsx
+│   │   ├── SplitBillScreen.tsx
+│   │   └── StatsScreen.tsx
+│   └── index.ts             # Export tất cả screens
+│
+├── components/              # Shared components
+│   ├── common/             # Các component dùng chung
+│   │   ├── Button/
+│   │   ├── Card/
+│   │   └── Input/
+│   └── features/           # Components theo feature
+│       ├── DailyNotification/
+│       └── InitialDataLoader/
+│
+├── contexts/               # React contexts
+│   └── AppContext/
+│       ├── AppContext.tsx
+│       ├── AppProvider.tsx
+│       └── index.ts
+│
+├── hooks/                  # Custom hooks
+│   └── useTheme.ts
+│
+├── services/              # Business logic, API calls
+│   ├── api/
+│   └── storage/
+│
+├── utils/                 # Helper functions
+│   ├── constants.ts
+│   └── helpers.ts
+│
+├── localization/          # Đa ngôn ngữ
+│   ├── en.json
+│   └── vi.json
+│
+└── theme/                # Theme configuration
+    ├── colors.ts
+    ├── typography.ts
+    └── index.ts

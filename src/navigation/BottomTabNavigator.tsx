@@ -1,42 +1,25 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/Ionicons';
-import MainScreen from '../Screens/Mainscreen';
-import StatsScreen from '../Screens/StatsScreen';
-import NotificationScreen from '../Screens/NotificationScreen';
-import SettingScreen from '../Screens/SettingScreen';
-import SplitBillScreen from '../Screens/SplitBillScreen'; // You'll need to create this screen
+import {
+  RootTabParamList,
+  ROUTES,
+  TAB_ICONS
+} from './types';
+import MainScreen from '../screens/main/Mainscreen';
+import StatsScreen from '../screens/main/StatsScreen';
+import NotificationScreen from '../screens/main/NotificationScreen';
+import SettingScreen from '../screens/main/SettingScreen';
+import SplitBillScreen from '../screens/main/SplitBillScreen';
 
-const Tab = createBottomTabNavigator();
+const Tab = createBottomTabNavigator<RootTabParamList>();
 
 const BottomTabNavigator: React.FC = () => {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         tabBarIcon: ({ color, size }) => {
-          let iconName: string;
-
-          switch (route.name) {
-            case 'Home':
-              iconName = 'home';
-              break;
-            case 'Stats':
-              iconName = 'bar-chart';
-              break;
-            case 'Split':
-              iconName = 'people';
-              break;
-            case 'Notifications':
-              iconName = 'notifications';
-              break;
-            case 'Settings':
-              iconName = 'settings';
-              break;
-            default:
-              iconName = 'help';
-              break;
-          }
-
+          const iconName = TAB_ICONS[route.name as ROUTES] || 'help';
           return <Icon name={iconName} size={size} color={color} />;
         },
         tabBarActiveTintColor: 'green',
@@ -44,17 +27,17 @@ const BottomTabNavigator: React.FC = () => {
       })}
     >
       <Tab.Screen 
-        name="Home" 
+        name={ROUTES.HOME}
         component={MainScreen} 
         options={{ headerShown: false }} 
       />
       <Tab.Screen 
-        name="Stats" 
+        name={ROUTES.STATS}
         component={StatsScreen}
         options={{ headerShown: false }} 
       />
       <Tab.Screen 
-        name="Split" 
+        name={ROUTES.SPLIT}
         component={SplitBillScreen}
         options={{ 
           headerShown: false,
@@ -62,12 +45,12 @@ const BottomTabNavigator: React.FC = () => {
         }} 
       />
       <Tab.Screen 
-        name="Notifications" 
+        name={ROUTES.NOTIFICATIONS}
         component={NotificationScreen} 
         options={{ headerShown: false }} 
       />
       <Tab.Screen 
-        name="Settings" 
+        name={ROUTES.SETTINGS}
         component={SettingScreen} 
         options={{ headerShown: false }} 
       />
