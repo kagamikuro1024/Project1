@@ -120,6 +120,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f5f5',
   },
   title: {
+    paddingTop: 16,
     fontSize: 24,
     fontWeight: 'bold',
     textAlign: 'center',

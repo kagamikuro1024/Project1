@@ -1,0 +1,18 @@
+{
+    "settings": {
+      "title": "Settings",
+      "language": "Language",
+      "theme": "Theme",
+      "about": "About",
+      "notifications": "Notifications",
+      "themes": {
+        "light": "Light",
+        "dark": "Dark",
+        "system": "System"
+      },
+      "languages": {
+        "vi": "Vietnamese",
+        "en": "English"
+      }
+    }
+  }

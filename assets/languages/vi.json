@@ -1,0 +1,18 @@
+{
+    "settings": {
+      "title": "Cài đặt",
+      "language": "Ngôn ngữ",
+      "theme": "Chủ đề",
+      "about": "Về ứng dụng",
+      "notifications": "Thông báo",
+      "themes": {
+        "light": "Sáng",
+        "dark": "Tối",
+        "system": "Theo hệ thống"
+      },
+      "languages": {
+        "vi": "Tiếng Việt",
+        "en": "English"
+      }
+    }
+  }

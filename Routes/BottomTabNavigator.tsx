@@ -5,6 +5,7 @@ import MainScreen from '../Screens/Mainscreen';
 import StatsScreen from '../Screens/StatsScreen';
 import NotificationScreen from '../Screens/NotificationScreen';
 import SettingScreen from '../Screens/SettingScreen';
+import SplitBillScreen from '../Screens/SplitBillScreen'; // You'll need to create this screen
 
 const Tab = createBottomTabNavigator();
 
@@ -21,6 +22,9 @@ const BottomTabNavigator: React.FC = () => {
               break;
             case 'Stats':
               iconName = 'bar-chart';
+              break;
+            case 'Split':
+              iconName = 'people';
               break;
             case 'Notifications':
               iconName = 'notifications';
@@ -48,6 +52,14 @@ const BottomTabNavigator: React.FC = () => {
         name="Stats" 
         component={StatsScreen}
         options={{ headerShown: false }} 
+      />
+      <Tab.Screen 
+        name="Split" 
+        component={SplitBillScreen}
+        options={{ 
+          headerShown: false,
+          title: 'Split Bill'
+        }} 
       />
       <Tab.Screen 
         name="Notifications" 

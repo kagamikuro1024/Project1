@@ -4,7 +4,9 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "jsx": "react-native",
-    "strict": true
+    "strict": true,
+    "module": "esnext",
+    "moduleResolution": "node"
   },
   "extends": "expo/tsconfig.base"
 }
