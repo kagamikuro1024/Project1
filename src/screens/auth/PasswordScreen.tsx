@@ -5,9 +5,15 @@ import { useAppContext } from '../../context/AppContext';
 
 interface PasswordScreenProps {
   onSuccess: () => void;
+  onCancel?: () => void;
+  showCancel?: boolean;
 }
 
-const PasswordScreen: React.FC<PasswordScreenProps> = ({ onSuccess }) => {
+const PasswordScreen: React.FC<PasswordScreenProps> = ({ 
+  onSuccess, 
+  onCancel,
+  showCancel = true 
+}) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const { state } = useAppContext();
@@ -30,6 +36,11 @@ const PasswordScreen: React.FC<PasswordScreenProps> = ({ onSuccess }) => {
   }, []);
 
   const handleSubmit = () => {
+    if (!password) {
+      setError('Vui lòng nhập mật khẩu');
+      return;
+    }
+
     if (password === state.password) {
       setError('');
       setPassword('');
@@ -67,12 +78,14 @@ const PasswordScreen: React.FC<PasswordScreenProps> = ({ onSuccess }) => {
         ) : null}
         
         <View style={styles.buttonContainer}>
-          <Button
-            mode="text"
-            onPress={onSuccess}
-            style={styles.button}>
-            Hủy
-          </Button>
+          {showCancel && (
+            <Button
+              mode="text"
+              onPress={onCancel}
+              style={styles.button}>
+              Hủy
+            </Button>
+          )}
           <Button
             mode="contained"
             onPress={handleSubmit}

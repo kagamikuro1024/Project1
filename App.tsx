@@ -10,10 +10,28 @@ import PasswordScreen from './src/screens/auth/PasswordScreen';
 
 const AppContent = () => {
   const { state } = useAppContext();
-  const [isAuthenticated, setIsAuthenticated] = useState(!state.hasPassword);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  if (!isAuthenticated) {
-    return <PasswordScreen onSuccess={() => setIsAuthenticated(true)} />;
+  useEffect(() => {
+    // Reset authentication when password is disabled
+    if (!state.hasPassword) {
+      setIsAuthenticated(true);
+    }
+    setIsLoading(false);
+  }, [state.hasPassword]);
+
+  if (isLoading) {
+    return null; // Or a loading spinner
+  }
+
+  if (state.hasPassword && !isAuthenticated) {
+    return (
+      <PasswordScreen 
+        onSuccess={() => setIsAuthenticated(true)} 
+        showCancel={false}
+      />
+    );
   }
 
   return (

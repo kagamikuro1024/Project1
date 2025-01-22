@@ -132,26 +132,6 @@ const SettingsScreen = () => {
 
   const togglePassword = () => {
     if (isPasswordEnabled) {
-      Alert.prompt(
-        'Nhập mật khẩu',
-        'Vui lòng nhập mật khẩu hiện tại để tắt tính năng',
-        [
-          { text: 'Hủy', style: 'cancel' },
-          {
-            text: 'Xác nhận',
-            onPress: async (value) => {
-              if (value === state.password) {
-                await AsyncStorage.removeItem(STORAGE_KEYS.PASSWORD);
-                setIsPasswordEnabled(false);
-                dispatch({ type: 'SET_PASSWORD', password: null });
-              } else {
-                Alert.alert('Lỗi', 'Mật khẩu không đúng');
-              }
-            },
-          },
-        ],
-        'secure-text'
-      );
       setShowPasswordVerificationModal(true);
     } else {
       setShowPasswordModal(true);
@@ -160,20 +140,25 @@ const SettingsScreen = () => {
   const handlePasswordVerificationSuccess = async (cancelled = false) => {
     setShowPasswordVerificationModal(false);
     if (!cancelled) {
-      await AsyncStorage.removeItem(STORAGE_KEYS.PASSWORD);
-      setIsPasswordEnabled(false);
-      dispatch({ type: 'SET_PASSWORD', password: null });
+      try {
+        await AsyncStorage.removeItem(STORAGE_KEYS.PASSWORD);
+        setIsPasswordEnabled(false);
+        dispatch({ type: 'SET_PASSWORD', password: null });
+      } catch (error) {
+        console.error('Error removing password:', error);
+        Alert.alert('Lỗi', 'Không thể xóa mật khẩu. Vui lòng thử lại.');
+      }
     }
   };
 
 
   const handleSetPassword = async () => {
     if (password !== confirmPassword) {
-      Alert.alert('Lỗi', 'Mật khẩu xác nhận không khớp');
+      setError('Mật khẩu xác nhận không khớp');
       return;
     }
     if (password.length < 4) {
-      Alert.alert('Lỗi', 'Mật khẩu phải có ít nhất 4 ký tự');
+      setError('Mật khẩu phải có ít nhất 4 ký tự');
       return;
     }
 
@@ -184,11 +169,12 @@ const SettingsScreen = () => {
       setShowPasswordModal(false);
       setPassword('');
       setConfirmPassword('');
+      setError('');
     } catch (error) {
       console.error('Error saving password:', error);
+      Alert.alert('Lỗi', 'Không thể lưu mật khẩu. Vui lòng thử lại.');
     }
   };
-
   const scheduleDailyNotification = async (time: string) => {
     const [hours, minutes] = time.split(':').map(Number);
 
@@ -387,32 +373,6 @@ const SettingsScreen = () => {
           ))}
         </Modal>
 
-        <Modal
-          visible={showPasswordModal}
-          onDismiss={() => setShowPasswordModal(false)}
-          contentContainerStyle={styles.modalContainer}>
-          <Text style={styles.modalTitle}>Đặt mật khẩu</Text>
-          <TextInput
-            secureTextEntry
-            label="Mật khẩu mới"
-            value={password}
-            onChangeText={setPassword}
-            style={styles.input}
-          />
-          <TextInput
-            secureTextEntry
-            label="Xác nhận mật khẩu"
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-            style={styles.input}
-          />
-          <Button
-            mode="contained"
-            onPress={handleSetPassword}
-            style={styles.modalButton}>
-            Xác nhận
-          </Button>
-        </Modal>
       </Portal>
 
       <TimePickerModal

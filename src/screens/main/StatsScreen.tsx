@@ -67,18 +67,21 @@ const StatsScreen = () => {
     const expense = groupedExpenses[i] || 0;
     barData.push(income);  // Thu nhập
     barData.push(expense); // Chi tiêu
-    // Center month label between the two bars
-    barLabels.push('');    // Empty label before income bar
-    barLabels.push(`T${i + 1}`); // Month label between bars
+    //barLabels.push('');    // Empty label for spacing
+    barLabels.push(`T${i + 1}`); // Month label
   }
-  
+
   const barChartData = {
     labels: barLabels,
     datasets: [{
       data: barData,
-      colors: barData.map((_, index) => (opacity = 1) =>
-        index % 2 === 0 ? `rgba(76, 192, 192, ${opacity})` : `rgba(255, 99, 132, ${opacity})`
-      )
+      backgroundColor: barData.map((_, index) =>
+        index % 2 === 0 ? 'rgba(76, 192, 192, 0.8)' : 'rgba(255, 99, 132, 0.8)'
+      ),
+      borderColor: barData.map((_, index) =>
+        index % 2 === 0 ? 'rgba(76, 192, 192, 1)' : 'rgba(255, 99, 132, 1)'
+      ),
+      borderWidth: 1
     }]
   };
 
@@ -124,12 +127,21 @@ const StatsScreen = () => {
               backgroundGradientTo: '#ffffff',
               decimalPlaces: 0,
               color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-              labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+              labelColor: (opacity = 1) => `rgba(51, 51, 51, ${opacity})`,
+              strokeWidth: 2,
               propsForLabels: {
-                fontSize: 12,
+                fontSize: 10,
+                fontWeight: 500,
               },
-              barPercentage: 0.7,
-              useShadowColorFromDataset: false
+              barPercentage: 0.75,
+              useShadowColorFromDataset: false,
+              propsForBackgroundLines: {
+                strokeDasharray: '5,5',
+                strokeWidth: 1,
+                strokeOpacity: 0.2,
+              },
+              formatTopBarValue: (value) => 
+                value >= 1000 ? (value / 1000000).toFixed(2) + 'tr' : value.toString() + ' đ',
             }}
             style={styles.barChart}
             fromZero={true}
@@ -220,6 +232,18 @@ const styles = StyleSheet.create({
   barChart: {
     borderRadius: 16,
     marginVertical: 8,
+    paddingHorizontal: 12,
+    backgroundColor: '#ffffff',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,              // Cho Android
+    borderWidth: 0.5,
+    borderColor: 'rgba(0,0,0,0.05)',
   },
   noDataText: {
     textAlign: 'center',

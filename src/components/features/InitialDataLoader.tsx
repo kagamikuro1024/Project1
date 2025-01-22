@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react';
 import { useAppContext } from '../../context/AppContext';
 
-const InitialDataLoader = () => {
+
+const InitialDataLoader = () => { 
   const { dispatch } = useAppContext();
 
   useEffect(() => {
@@ -78,6 +79,84 @@ const InitialDataLoader = () => {
       },
     ];  
     januaryData.forEach(item => {
+      if (item.category === "Thu nhập") {
+        dispatch({ type: 'ADD_INCOME', payload: item });
+      } else {
+        dispatch({ type: 'ADD_EXPENSE', payload: item });
+      }
+    });
+    const marchData = [
+      {
+        date: "2024-03-01",
+        amount: "5000000",
+        description: "Lương tháng 3",
+        category: "Thu nhập"
+      },
+      {
+        date: "2024-03-05",
+        amount: "500000",
+        category: "Du lịch",
+        description: "Du lịch cuối năm"
+      },
+      {
+        date: "2024-03-10",
+        amount: "2000000",
+        category: "Ăn uống",
+        description: "Chi tiêu ăn uống"
+      },
+      {
+        date: "2024-03-15",
+        amount: "1000000",
+        category: "Giải trí",
+        description: "Chi tiêu giải trí"
+      },
+      {
+        date: "2024-03-20",
+        amount: "500000",
+        category: "Khác",
+        description: "Chi tiêu khác"
+      },
+    ];
+    marchData.forEach(item => {
+      if (item.category === "Thu nhập") {
+        dispatch({ type: 'ADD_INCOME', payload: item });
+      } else {
+        dispatch({ type: 'ADD_EXPENSE', payload: item });
+      }
+    });
+    const aprilData = [
+      {
+        date: "2024-04-01",
+        amount: "6000000",
+        description: "Lương tháng 4",
+        category: "Thu nhập"
+      },
+      {
+        date: "2024-04-05",
+        amount: "700000",
+        category: "Du lịch",
+        description: "Du lịch cuối năm"
+      },
+      {
+        date: "2024-04-10",
+        amount: "3000000",
+        category: "Ăn uống",
+        description: "Chi tiêu ăn uống"
+      },
+      {
+        date: "2024-04-15",
+        amount: "2000000",
+        category: "Giải trí",
+        description: "Chi tiêu giải trí"
+      },
+      {
+        date: "2024-04-20",
+        amount: "1000000",
+        category: "Khác",
+        description: "Chi tiêu khác"
+      },
+    ];
+    aprilData.forEach(item => {
       if (item.category === "Thu nhập") {
         dispatch({ type: 'ADD_INCOME', payload: item });
       } else {

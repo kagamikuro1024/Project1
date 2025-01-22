@@ -29,6 +29,7 @@ type Action =
   | { type: 'SET_THEME'; theme: string }
   | { type: 'SET_LANGUAGE'; language: string }
   | { type: 'SET_PASSWORD'; password: string | null }
+  | { type: 'INIT_STATE'; state: Partial<AppState> }
   | { type: 'SET_DAILY_NOTIFICATION_TIME'; time: string | null }
 
 const initialState: AppState = {
@@ -40,7 +41,8 @@ const initialState: AppState = {
   language: 'vi',
   hasPassword: false,
   password: null,
-  dailyNotificationTime: null
+  dailyNotificationTime: null,
+  
 };
 
 const appReducer = (state: AppState, action: Action): AppState => {
@@ -122,6 +124,12 @@ const appReducer = (state: AppState, action: Action): AppState => {
           hasPassword: !!action.password,
           password: action.password,
         };
+      case 'INIT_STATE':
+        return {
+          ...state,
+          ...action.state,
+          hasPassword: !!action.state.password,
+        };  
       case 'SET_DAILY_NOTIFICATION_TIME':
         return {
           ...state,
