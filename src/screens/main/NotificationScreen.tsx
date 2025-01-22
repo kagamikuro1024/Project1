@@ -1,9 +1,18 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, StyleSheet, FlatList, Alert } from 'react-native';
+import { View, StyleSheet, FlatList, Alert, TouchableOpacity } from 'react-native';
 import { Text, Card, IconButton, Button } from 'react-native-paper';
 import * as Notifications from 'expo-notifications';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAppContext } from '../../context/AppContext';
+
+// Cấu hình cho notifications
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+  }),
+});
 
 const NotificationScreen = () => {
   const { state } = useAppContext();
@@ -11,15 +20,80 @@ const NotificationScreen = () => {
 
   useEffect(() => {
     const init = async () => {
+      // Thiết lập listener cho notification
+      const subscription = Notifications.addNotificationReceivedListener(notification => {
+        console.log('Notification received:', notification);
+      });
+
+      // Thiết lập listener cho việc click vào notification
+      const responseSubscription = Notifications.addNotificationResponseReceivedListener(response => {
+        const data = response.notification.request.content.data;
+        showNotificationDetails(
+          response.notification.request.content.title ?? '',
+          response.notification.request.content.body ?? '',
+          data
+        );
+      });
+
       const isEnabled = await checkDailyNotificationStatus();
       if (isEnabled) {
-        fetchScheduledNotifications();
+        await fetchScheduledNotifications();
       } else {
-        setNotifications([]); // Không hiển thị nếu chưa bật thông báo
+        setNotifications([]);
       }
+
+      // Gửi thông báo chào mừng
+      await sendWelcomeNotification();
+
+      // Cleanup subscriptions
+      return () => {
+        subscription.remove();
+        responseSubscription.remove();
+      };
     };
+
     init();
   }, []);
+
+  const sendWelcomeNotification = async () => {
+    try {
+      const identifier = await Notifications.scheduleNotificationAsync({
+        content: {
+          title: 'Chào mừng trở lại! 👋',
+          body: 'Chào mừng quay trở lại, hãy nhập thông tin tài chính ngày hôm nay nào!!!',
+          subtitle: null,
+          data: { type: 'welcome' },
+        },
+        trigger: null, // Gửi ngay lập tức
+      });
+
+      // Thêm thông báo vào state
+      const newNotification: Notifications.NotificationRequest = {
+        identifier,
+        content: {
+          title: 'Chào mừng trở lại! 👋',
+          subtitle: null,
+          body: 'Chào mừng quay trở lại, hãy nhập thông tin tài chính ngày hôm nay nào!!!',
+          data: { type: 'welcome' },
+          sound: null,
+        },
+        trigger: { type: 'timeInterval', seconds: 1, repeats: false },
+      };
+
+      setNotifications(prev => [newNotification, ...prev]);
+    } catch (error) {
+      console.error('Error sending welcome notification:', error);
+    }
+  };
+
+  const showNotificationDetails = (title: string, body: string, data: any) => {
+    Alert.alert(
+      title,
+      body,
+      [{ text: 'OK', onPress: () => console.log('Alert closed') }],
+      { cancelable: true }
+    );
+  };
 
   useEffect(() => {
     if (state) {
@@ -27,9 +101,44 @@ const NotificationScreen = () => {
     }
   }, [state]);
 
-  const checkDailyNotificationStatus = async () => {
-    const isEnabled = await AsyncStorage.getItem('DailyNotificationEnabled');
-    return isEnabled === 'true';
+  const createNotification = async (title: string, body: string) => {
+    try {
+      const identifier = await Notifications.scheduleNotificationAsync({
+        content: {
+          title,
+          subtitle: null,
+          data: { type: 'update' },
+        },
+        trigger: null, // Gửi ngay lập tức
+      });
+
+      // Thêm thông báo vào state
+      const newNotification: Notifications.NotificationRequest = {
+        identifier,
+        content: {
+          title,
+          subtitle: null,
+          body,
+          data: { type: 'update' },
+          sound: null,
+        },
+        trigger: { type: 'timeInterval', seconds: 1, repeats: false },
+      };
+
+      setNotifications(prev => [newNotification, ...prev]);
+    } catch (error) {
+      console.error('Error creating notification:', error);
+    }
+  };
+
+  const checkDailyNotificationStatus = async (): Promise<boolean> => {
+    try {
+      const status = await AsyncStorage.getItem('dailyNotificationStatus');
+      return status === 'enabled';
+    } catch (error) {
+      console.error('Error checking daily notification status:', error);
+      return false;
+    }
   };
 
   const fetchScheduledNotifications = async () => {
@@ -41,32 +150,10 @@ const NotificationScreen = () => {
     }
   };
 
-  const createNotification = async (title: string, body: string) => {
-    try {
-      const identifier = await Notifications.scheduleNotificationAsync({
-        content: {
-          title,
-          body,
-        },
-        trigger: null, // Gửi ngay lập tức
-      });
-      setNotifications((prevNotifications) => [
-              ...prevNotifications,
-              {
-                identifier,
-                content: { title, body, subtitle: null, data: {}, sound: null },
-                trigger: { seconds: 0, repeats: false, type: 'timeInterval' }, // Valid NotificationTrigger
-              },
-            ]);
-    } catch (error) {
-      console.error('Error creating notification:', error);
-    }
-  };
-
   const cancelNotification = async (identifier: string) => {
     try {
       await Notifications.cancelScheduledNotificationAsync(identifier);
-      setNotifications(notifications.filter(notification => notification.identifier !== identifier));
+      setNotifications(prev => prev.filter(notification => notification.identifier !== identifier));
     } catch (error) {
       console.error('Error canceling notification:', error);
     }
@@ -81,20 +168,30 @@ const NotificationScreen = () => {
     }
   };
 
+  // ... các hàm khác giữ nguyên ...
+
   const renderItem = ({ item }: { item: Notifications.NotificationRequest }) => (
-    <Card style={styles.card}>
-      <Card.Title
-        title={item.content.title}
-        subtitle={item.content.body}
-        right={(props) => (
-          <IconButton
-            {...props}
-            icon="close"
-            onPress={() => cancelNotification(item.identifier)}
-          />
-        )}
-      />
-    </Card>
+    <TouchableOpacity
+      onPress={() => showNotificationDetails(
+        item.content.title ?? '',
+        item.content.body ?? '',
+        item.content.data
+      )}
+    >
+      <Card style={styles.card}>
+        <Card.Title
+          title={item.content.title}
+          subtitle={item.content.body}
+          right={(props) => (
+            <IconButton
+              {...props}
+              icon="close"
+              onPress={() => cancelNotification(item.identifier)}
+            />
+          )}
+        />
+      </Card>
+    </TouchableOpacity>
   );
 
   return (
@@ -128,7 +225,15 @@ const styles = StyleSheet.create({
   },
   card: {
     marginVertical: 8,
-    padding: 16, // Tăng kích thước hộp thông báo
+    padding: 16,
+    elevation: 4, // Tăng độ nổi cho card
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
   noDataText: {
     textAlign: 'center',
@@ -138,7 +243,8 @@ const styles = StyleSheet.create({
   },
   button: {
     marginTop: 16,
-    color: 'white',
+    marginBottom: 16,
+    backgroundColor: 'grey', // Màu đỏ cho nút xóa
   },
 });
 
